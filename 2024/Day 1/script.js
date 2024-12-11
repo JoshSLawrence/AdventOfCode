@@ -4,7 +4,7 @@ const readline = require("readline");
 var leftSide = [];
 var rightSide = [];
 
-async function processLineByLine() {
+async function solution() {
   const fileStream = fs.createReadStream("input.txt");
 
   const rl = readline.createInterface({
@@ -21,13 +21,34 @@ async function processLineByLine() {
   leftSide.sort();
   rightSide.sort();
 
-  var total = 0;
-  for (let index = 0; index < 1000; index++) {
-    var distance = Math.abs(leftSide[index] - rightSide[index]);
-    total = total + distance;
+  var totalPart1 = 0;
+  for (let i = 0; i < 1000; i++) {
+    var distance = Math.abs(leftSide[i] - rightSide[i]);
+    totalPart1 = totalPart1 + distance;
   }
 
-  console.log(total);
+  var dict = {};
+  // Forgive me for my sins
+  for (let i = 0; i < 1000; i++) {
+    for (let j = 0; j < 1000; j++) {
+      if (leftSide[i] === rightSide[j]) {
+        if (dict[leftSide[i]]) {
+          dict[leftSide[i]] = dict[leftSide[i]] + 1;
+        } else {
+          dict[leftSide[i]] = 1;
+        }
+      }
+    }
+  }
+
+  var totalPart2 = 0;
+  for (const key of Object.keys(dict)) {
+    var product = key * dict[key];
+    totalPart2 = totalPart2 + product;
+  }
+
+  console.log(`Part 1 Answer: ${totalPart1}`);
+  console.log(`Part 2 Answer: ${totalPart2}`);
 }
 
-processLineByLine();
+solution();
