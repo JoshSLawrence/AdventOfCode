@@ -1,9 +1,6 @@
 import fs from "node:fs/promises";
 
-async function checkReport(report) {
-  // Split all numbers in the current line into an array
-  let dataset = report.split(" ");
-
+async function checkReport(dataset) {
   // previous and initalDirection are used for positional
   // comparison to determine if the report's dataset is
   // consistently increasing or decreasing
@@ -62,28 +59,68 @@ async function checkReport(report) {
   return true;
 }
 
+async function dampener(dataset) {
+  // First we run the regular check as normal
+  let initalResult = await checkReport(dataset);
+
+  if (initalResult === true) {
+    return true;
+  }
+
+  // At this point the regular check failed, now we test removing
+  // datapoints in each position of the dataset, run the new dataset
+  // against the check, until we either pass, or run out of datapoints
+  for (let i = 0; i < dataset.length; i++) {
+    let tempDataset = dataset.filter((_, index) => index !== i);
+
+    let tempResult = await checkReport(tempDataset);
+
+    if (tempResult === true) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 async function main() {
   const reports = (await fs.readFile("input.txt", "utf8"))
     .split("\n")
     .filter((line) => line.trim() !== "");
 
   let totalSafeReports = 0;
+  let totalSafeReportsWithDampener = 0;
 
   for (let i = 0; i < reports.length; i++) {
-    let result = await checkReport(reports[i]);
+    let dataset = reports[i].split(" ");
+
+    let result = await checkReport(dataset);
+    let resultWithDampener = await dampener(dataset);
 
     if (result) {
       totalSafeReports++;
     }
+
+    if (resultWithDampener) {
+      totalSafeReportsWithDampener++;
+    }
   }
 
+  console.log("\n[WITHOUT DAMPENER]");
   console.log(`Total safe reports: ${totalSafeReports}`);
   console.log(
     `Total failed reports: ${Math.abs(totalSafeReports - reports.length)}`,
   );
   console.log(`Total reports: ${reports.length}`);
+
+  console.log("\n[WITH DAMPENER]");
+  console.log(`Total safe reports: ${totalSafeReportsWithDampener}`);
+  console.log(
+    `Total failed reports: ${Math.abs(totalSafeReportsWithDampener - reports.length)}`,
+  );
+  console.log(`Total reports: ${reports.length}\n`);
 }
 
-console.time("script");
+console.time("Runtime");
 await main();
-console.timeEnd("script");
+console.timeEnd("Runtime");
