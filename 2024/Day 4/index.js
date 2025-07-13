@@ -21,7 +21,7 @@ class PuzzleLetter {
     this.solutions = 0;
   }
 
-  calcSolutions(dataset) {
+  calcSolutionsPart1(dataset) {
     this.calcDirection(Direction.North, dataset);
     this.calcDirection(Direction.South, dataset);
     this.calcDirection(Direction.East, dataset);
@@ -68,15 +68,77 @@ class PuzzleLetter {
       return false;
     }
   }
+
+  calcSolutionsPart2(dataset) {
+    // NOTE: We do not check every direction relative to the current
+    // position like we did in part 1. Its redundant, by nature of going
+    // through each position, even if evaluting one direction, we will
+    // naturally find every solution exactly once.
+
+    // Simlar to part 1, we ensure there is a valid X pattern relative
+    // to the current position.
+    for (let i = 0; i < 3; i++) {
+      if (
+        typeof dataset[this.row + i] === "undefined" ||
+        typeof dataset[this.row + i][this.column + i] === "undefined" ||
+        typeof dataset[this.row + i][this.column - i + 2] === "undefined"
+      ) {
+        return false;
+      }
+    }
+
+    // Next, we build an psuedo 3x3 grid relative to the current position.
+    const currentPosition = [
+      dataset[this.row][this.column] + "." + dataset[this.row][this.column + 2],
+      "." + dataset[this.row + 1][this.column + 1] + ".",
+      dataset[this.row + 2][this.column] +
+        "." +
+        dataset[this.row + 2][this.column + 2],
+    ];
+
+    // There are only 4 possible solution patterns
+    // the structure of this array of string matches currentPosition
+    // so all we need to do is check 4 cases.
+    const solution1 = ["M.S", ".A.", "M.S"];
+    const solution2 = ["S.M", ".A.", "S.M"];
+    const solution3 = ["M.M", ".A.", "S.S"];
+    const solution4 = ["S.S", ".A.", "M.M"];
+
+    if (
+      currentPosition[0] === solution1[0] &&
+      currentPosition[1] === solution1[1] &&
+      currentPosition[2] === solution1[2]
+    ) {
+      this.solutions += 1;
+    } else if (
+      currentPosition[0] === solution2[0] &&
+      currentPosition[1] === solution2[1] &&
+      currentPosition[2] === solution2[2]
+    ) {
+      this.solutions += 1;
+    } else if (
+      currentPosition[0] === solution3[0] &&
+      currentPosition[1] === solution3[1] &&
+      currentPosition[2] === solution3[2]
+    ) {
+      this.solutions += 1;
+    } else if (
+      currentPosition[0] === solution4[0] &&
+      currentPosition[1] === solution4[1] &&
+      currentPosition[2] === solution4[2]
+    ) {
+      this.solutions += 1;
+    }
+  }
 }
 
-export function solve(dataset) {
+export function solvePart1(dataset) {
   let solutions = 0;
 
   for (let row = 0; row < dataset.length; row++) {
     for (let column = 0; column < dataset[row].length; column++) {
       const letter = new PuzzleLetter(row, column);
-      letter.calcSolutions(dataset);
+      letter.calcSolutionsPart1(dataset);
       solutions += letter.solutions;
     }
   }
@@ -88,10 +150,26 @@ export function solve(dataset) {
   return solutions / 2;
 }
 
+export function solvePart2(dataset) {
+  let solutions = 0;
+
+  for (let row = 0; row < dataset.length; row++) {
+    for (let column = 0; column < dataset[row].length; column++) {
+      const letter = new PuzzleLetter(row, column);
+      letter.calcSolutionsPart2(dataset);
+      solutions += letter.solutions;
+    }
+  }
+
+  return solutions;
+}
+
 async function main() {
   const data = await readFile("input.txt", "utf-8");
   let dataset = data.split("\n").filter((line) => line.trim() !== "");
-  console.log("XMAS appears:", solve(dataset), "times.");
+
+  console.log("XMAS appears:", solvePart1(dataset), "times.");
+  console.log("X-MAS appears:", solvePart2(dataset), "times.");
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

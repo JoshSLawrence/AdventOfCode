@@ -1,8 +1,8 @@
 import { describe, test, expect } from "vitest";
-import { solve } from "../index.js";
+import { solve, solvePart1, solvePart2 } from "../index.js";
 
-describe("solve", () => {
-  test("Advent of Code provided test case #1", () => {
+describe("Part1", () => {
+  test("Advent of Code part 1 provided test case", () => {
     const dataset = [
       "MMMSXXMASM",
       "MSAMXMSMSA",
@@ -15,7 +15,7 @@ describe("solve", () => {
       "MAMMMXMMMM",
       "MXMXAXMASX",
     ];
-    const result = solve(dataset);
+    const result = solvePart1(dataset);
     expect(result).toBe(18);
   });
 
@@ -26,7 +26,26 @@ describe("solve", () => {
       "A.........................",
       "S.........................",
     ];
-    let solutions = solve(dataset);
+    let solutions = solvePart1(dataset);
     expect(solutions).toBe(1);
+  });
+});
+
+describe("Part2", () => {
+  test("Advent of Code part 2 provided test case", () => {
+    const dataset = [
+      ".M.S......",
+      "..A..MSMS.",
+      ".M.S.MAA..",
+      "..A.ASMSM.",
+      ".M.S.M....",
+      "..........",
+      "S.S.S.S.S.",
+      ".A.A.A.A..",
+      "M.M.M.M.M.",
+      "..........",
+    ];
+    const result = solvePart2(dataset);
+    expect(result).toBe(9);
   });
 });
