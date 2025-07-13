@@ -9,8 +9,9 @@ const Phase = {
   CloseParen: 5,
 };
 
-const LOG_ENABLED = process.argv.slice(2).includes("--log");
-
+// If --log is passed at the command line, the program will print out
+// the symbols parsed - for debug.
+const LOG_ENABLED = process.argv.slice(2).includes("--debug");
 function log(...message) {
   if (LOG_ENABLED) {
     console.log(...message);
@@ -97,10 +98,50 @@ export function parse(line, length, index = 0, phase = Phase.Mul) {
   return [false, index];
 }
 
-export function getSumOfProducts(line) {
+export function getSumOfProducts(
+  line,
+  enableConditionalElements = false, // Dictates if do() and don't() are considered
+  doEnabled = true, // Store state of last do() don't() processed
+) {
   let index = 0;
   let sum = 0;
   do {
+    // Check if conditionals are to be evaluated
+    // Check if do is DISABLED, meaning a don't() was recentily evaluated
+    // Check if the current index + 4 is equal to do()
+    // If so, re-enable, jump index ahead and continue
+    // Else we are still disabled so bump index and continue
+    if (
+      enableConditionalElements &&
+      !doEnabled &&
+      line.slice(index, index + 4) === "do()"
+    ) {
+      doEnabled = true;
+      index += 4;
+      continue;
+    } else if (enableConditionalElements && !doEnabled) {
+      index++;
+      continue;
+    }
+
+    // Check if conditionals are to be evaluated
+    // Check if do is ENABLED, meaning a do() was recentily evaluated
+    // Check if the current index + 7 is equal to don't()
+    // If so, disable, jump index ahead and continue
+    // Else we are still enabled so proceed with parsing
+    if (
+      enableConditionalElements &&
+      doEnabled &&
+      line.slice(index, index + 7) === "don't()"
+    ) {
+      doEnabled = false;
+      index += 7;
+      continue;
+    }
+
+    // NOTE: parse recursively calls itself, so we receive the right operand,
+    // int 2, before the left, int 1. This doesn't really matter since we are
+    // doing multiplication but just as a FYI
     let [result, endingIndex, int2, int1] = parse(line, line.length, index);
     if (result) {
       sum += int1 * int2;
@@ -109,21 +150,44 @@ export function getSumOfProducts(line) {
       index = endingIndex + 1;
     }
   } while (index < line.length);
-  return sum;
+
+  // Return the state of doEnabled as this problem requires the state to
+  // be tracked per line. i.e. If do starts ENABLED, and if at the end of
+  // processing the first line do is now DISABLED, then once we start parsing
+  // the next line do should STILL BE DISABLED, we shouldn't reset the state of
+  // do as all lines should be evaluated as a single dataset.
+  // I could've joined the lines to evaluate as a signle line, but I didn't.
+  return [sum, doEnabled];
 }
 
 async function main() {
   const input = await fs.readFile("input.txt", "utf8");
-
   const lines = input.split("\n").filter((line) => line.trim() !== "");
 
-  let total = 0;
+  let part1Total = 0;
+  let part2Total = 0;
+  let enableConditionalElements = true;
+
+  // If conditional elements are enabled, this will track the state of do() and don't()
+  let doEnabled = true;
 
   lines.forEach((line) => {
-    total += getSumOfProducts(line);
+    let [sum, _] = getSumOfProducts(line);
+    part1Total += sum;
   });
 
-  console.log("Total:", total);
+  lines.forEach((line) => {
+    let [sum, stillEnabled] = getSumOfProducts(
+      line,
+      enableConditionalElements,
+      doEnabled,
+    );
+    doEnabled = stillEnabled;
+    part2Total += sum;
+  });
+
+  console.log("Part 1 Total:", part1Total);
+  console.log("Part 2 Total:", part2Total);
 }
 
 await main();
