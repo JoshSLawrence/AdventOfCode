@@ -1,0 +1,23 @@
+{
+  "name": "adventofcode-2024-day6",
+  "version": "1.0.0",
+  "description": "Advent of Code 2024 Day 6",
+  "homepage": "https://github.com/joshslawrence/adventofcode#readme",
+  "bugs": {
+    "url": "https://github.com/joshslawrence/adventofcode/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshslawrence/adventofcode.git"
+  },
+  "author": "josh@joshlawrence.dev",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "start": "node index.js"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}
