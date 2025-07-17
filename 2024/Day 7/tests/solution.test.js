@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { solvePart1, Test } from "../index.js";
+import { solvePart1, solvePart2, Test } from "../index.js";
 
 describe("Day 7 - Solution Tests", () => {
   test("Test parseTests())", async () => {
@@ -33,5 +33,10 @@ describe("Day 7 - Solution Tests", () => {
   test("Advent of Code provided test case #1", async () => {
     let result = await solvePart1("tests/simpleinput.txt");
     expect(result).toBe(3749);
+  });
+
+  test("Advent of Code provided test case #2", async () => {
+    let result = await solvePart2("tests/simpleinput.txt");
+    expect(result).toBe(11387);
   });
 });

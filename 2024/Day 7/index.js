@@ -15,6 +15,20 @@ export async function solvePart1(input) {
   return sum;
 }
 
+export async function solvePart2(input) {
+  const tests = await Test.parseTests(input);
+
+  let sum = 0;
+
+  tests.forEach((test) => {
+    let result = test.solve(true);
+    if (result) {
+      sum += test.testValue;
+    }
+  });
+  return sum;
+}
+
 export class Test {
   #testValue;
   #operands;
@@ -34,7 +48,7 @@ export class Test {
     return this.#operands;
   }
 
-  solve() {
+  solve(concat = false) {
     let container = [this.#operands[0]];
 
     for (let i = 1; i < this.#operands.length; i++) {
@@ -42,6 +56,9 @@ export class Test {
       container.forEach((number) => {
         newContainer.push(number * this.#operands[i]);
         newContainer.push(number + this.#operands[i]);
+        if (concat) {
+          newContainer.push(parseInt(`${number}${this.#operands[i]};`));
+        }
       });
       container = newContainer;
     }
@@ -82,7 +99,9 @@ export class Test {
 
 async function main() {
   let part1Answer = await solvePart1("input.txt");
+  let part2Answer = await solvePart2("input.txt");
   console.log("Part 1 sum of test values:", part1Answer);
+  console.log("Part 2 sum of test values:", part2Answer);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
