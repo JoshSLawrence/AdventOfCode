@@ -9,6 +9,11 @@ Happy Holidays!
 
 ## Solutions
 
+### 2025
+
+I lied, 2025 is my first *real* attempt given I am actually participating during
+the holiday season as the question release. This year, I am taking a stab at Golang!
+
 ### 2024
 
 2024 was my first stab at Advent of Code, I decided to use JavaScript. I've
