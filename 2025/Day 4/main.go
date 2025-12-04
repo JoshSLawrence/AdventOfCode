@@ -24,14 +24,17 @@ func GetInput(filename string) []string {
 	return input
 }
 
-func SolvePart1(input []string) int {
+func RemoveRolls(input []string) (int, []string) {
 	solution := 0
 	offsets := [8][2]int{
 		{-1, -1}, {-1, 0}, {-1, 1},
 		{0, -1}, {0, 1}, // No Center
 		{1, -1}, {1, 0}, {1, 1},
 	}
+	updatedInput := make([]string, len(input))
+	copy(updatedInput, input)
 	for i := range input {
+		row := []byte(updatedInput[i])
 		for j := 0; j < len(input[i]); j++ {
 			if input[i][j] != '@' {
 				continue
@@ -51,7 +54,22 @@ func SolvePart1(input []string) int {
 			}
 			if count < 4 {
 				solution += 1
+				row[j] = '.'
 			}
+		}
+		updatedInput[i] = string(row)
+	}
+	return solution, updatedInput
+}
+
+func RemoveMaxRolls(input []string) int {
+	solution := 0
+	for {
+		rollsRemoved, updatedInput := RemoveRolls(input)
+		input = updatedInput
+		solution += rollsRemoved
+		if rollsRemoved == 0 {
+			break
 		}
 	}
 	return solution
@@ -59,6 +77,8 @@ func SolvePart1(input []string) int {
 
 func main() {
 	input := GetInput("input.txt")
-	solution1 := SolvePart1(input)
+	solution1, _ := RemoveRolls(input)
+	solution2 := RemoveMaxRolls(input)
 	fmt.Println(solution1)
+	fmt.Println(solution2)
 }
